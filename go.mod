@@ -7,7 +7,7 @@ require (
 	github.com/go-xlan/elasticapm v0.0.1
 	github.com/stretchr/testify v1.9.0
 	github.com/yyle88/erero v1.0.11
-	github.com/yyle88/neatjson v0.0.7
+	github.com/yyle88/neatjson v0.0.8
 	github.com/yyle88/zaplog v0.0.10
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.2
 	go.elastic.co/apm/v2 v2.6.2
@@ -35,7 +35,7 @@ require (
 	go.elastic.co/fastjson v1.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240930140551-af27646dc61f // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241007155032-5fefd90f89a9 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

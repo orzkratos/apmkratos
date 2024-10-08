@@ -16,38 +16,46 @@ import (
 )
 
 func Middleware() middleware.Middleware {
-	return func(handler middleware.Handler) middleware.Handler {
+	var m1 middleware.Middleware = NewApmTraceMiddleware() //追踪流程
+	var m2 middleware.Middleware = NewRecoveryMiddleware() //追踪崩溃
+	return func(handleFunc middleware.Handler) middleware.Handler {
+		return m1(m2(handleFunc))
+	}
+}
+
+func NewApmTraceMiddleware() middleware.Middleware {
+	return func(handleFunc middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, arg interface{}) (interface{}, error) {
-			tp, ok := transport.FromServerContext(ctx)
+			tsp, ok := transport.FromServerContext(ctx)
 			if !ok {
-				return handler(ctx, arg)
+				return handleFunc(ctx, arg)
 			}
 
-			switch tp.Kind() {
+			switch tsp.Kind() {
 			case transport.KindGRPC:
 				var opts apm.TransactionOptions
-				opts.TraceContext = obtainIncomingMetadataTraceContext(tp.RequestHeader())
-				tx := apm.DefaultTracer().StartTransactionOptions(tp.Operation(), "request", opts)
-				ctx = apm.ContextWithTransaction(ctx, tx)
-				ctx = newOutgoingContextWithTraceContext(ctx, tx.TraceContext())
-				defer tx.End()
-				defer setGRPCContext(&tx.Context)
+				opts.TraceContext = obtainIncomingMetadataTraceContext(tsp.RequestHeader())
+				apmTx := apm.DefaultTracer().StartTransactionOptions(tsp.Operation(), "request", opts)
+				ctx = apm.ContextWithTransaction(ctx, apmTx)
+				ctx = newOutgoingContextWithTraceContext(ctx, apmTx.TraceContext())
+				defer apmTx.End()
+				defer setGRPCContext(&apmTx.Context)
 			case transport.KindHTTP:
 				htx := GetHttpTspFromContext(ctx)
 				req := htx.Request()
 				requestName := apmhttp.ServerRequestName(req)
-				tx, body, req := apmhttp.StartTransactionWithBody(apm.DefaultTracer(), requestName, req)
-				ctx = apm.ContextWithTransaction(ctx, tx)
-				ctx = newOutgoingContextWithTraceContext(ctx, tx.TraceContext())
-				defer tx.End()
-				defer setHTTPContext(&tx.Context, body, req)
+				apmTx, body, req := apmhttp.StartTransactionWithBody(apm.DefaultTracer(), requestName, req)
+				ctx = apm.ContextWithTransaction(ctx, apmTx)
+				ctx = newOutgoingContextWithTraceContext(ctx, apmTx.TraceContext())
+				defer apmTx.End()
+				defer setHTTPContext(&apmTx.Context, body, req)
 			}
-			res, err := handler(ctx, arg)
+			res, err := handleFunc(ctx, arg)
 			if err != nil {
-				tx := apm.TransactionFromContext(ctx)
-				defer tx.End()
+				apmTx := apm.TransactionFromContext(ctx)
+				defer apmTx.End()
 				e := apm.DefaultTracer().NewError(err)
-				e.SetTransaction(tx)
+				e.SetTransaction(apmTx)
 				e.Send()
 			}
 			return res, err
@@ -109,26 +117,21 @@ func GetHttpTspFromContext(ctx context.Context) *http.Transport {
 }
 
 func NewRecoveryMiddleware() middleware.Middleware {
-	return recovery.Recovery(NewRecoveryOption())
-}
-
-func NewRecoveryOption() recovery.Option {
-	return NewRecoveryOptionWithErkFunc(func(format string, args ...interface{}) *errors.Error {
+	return recovery.Recovery(NewRecoveryApmOptions(func(format string, args ...interface{}) *errors.Error {
 		return errors.Newf(500, "INTERNAL-SERVER-ERROR", format, args...)
-	})
+	}))
 }
 
-func NewRecoveryOptionWithErkFunc(newErkFunc func(format string, args ...interface{}) *errors.Error) recovery.Option {
-	return recovery.WithHandler(func(ctx context.Context, req, err interface{}) error {
-		tx := apm.TransactionFromContext(ctx)
-		if tx == nil { // 注意这时 recovery.Recovery() middle 不能设置在 apm middleware 的前面
-			// 否则将会从这里返回
-			return newErkFunc("service panic (no apm) error=%v", err)
+func NewRecoveryApmOptions(efn func(format string, args ...interface{}) *errors.Error) recovery.Option {
+	return recovery.WithHandler(func(ctx context.Context, req, erx interface{}) error {
+		apmTx := apm.TransactionFromContext(ctx)
+		if apmTx == nil { // 注意这时 recovery.Recovery() middle 不能设置在 apm middleware 的前面
+			return efn("service panic (no apm) erx=%v", erx)
 		}
-		defer tx.End()
-		e := apm.DefaultTracer().Recovered(err)
-		e.SetTransaction(tx)
+		defer apmTx.End()
+		e := apm.DefaultTracer().Recovered(erx)
+		e.SetTransaction(apmTx)
 		e.Send()
-		return newErkFunc("service panic error=%v", err) //该返回值将被调用层拿到
+		return efn("service panic erx=%v", erx) //该返回值将被调用层拿到
 	})
 }
