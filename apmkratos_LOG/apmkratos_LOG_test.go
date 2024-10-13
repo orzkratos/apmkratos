@@ -1,4 +1,4 @@
-package apmkratoslog
+package apmkratos_LOG
 
 import (
 	"testing"
