@@ -1,4 +1,4 @@
-package apmkratos_LOG
+package apmkratoslog
 
 import (
 	"fmt"
