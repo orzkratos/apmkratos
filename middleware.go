@@ -34,14 +34,14 @@ func NewApmTraceMiddleware() middleware.Middleware {
 			switch tsp.Kind() {
 			case transport.KindGRPC:
 				var opts apm.TransactionOptions
-				opts.TraceContext = obtainIncomingMetadataTraceContext(tsp.RequestHeader())
+				opts.TraceContext = parseIncomingMetadataTraceContext(tsp.RequestHeader())
 				apmTx := apm.DefaultTracer().StartTransactionOptions(tsp.Operation(), "request", opts)
 				ctx = apm.ContextWithTransaction(ctx, apmTx)
 				ctx = newOutgoingContextWithTraceContext(ctx, apmTx.TraceContext())
 				defer apmTx.End()
 				defer setGRPCContext(&apmTx.Context)
 			case transport.KindHTTP:
-				htx := GetHttpTspFromContext(ctx)
+				htx := GetHttpTransportFromContext(ctx)
 				req := htx.Request()
 				requestName := apmhttp.ServerRequestName(req)
 				apmTx, body, req := apmhttp.StartTransactionWithBody(apm.DefaultTracer(), requestName, req)
@@ -78,7 +78,7 @@ func setHTTPContext(ctx *apm.Context, body *apm.BodyCapturer, req *nethttp.Reque
 	// ctx.SetHTTPResponseHeaders(c.Writer.Header())
 }
 
-func obtainIncomingMetadataTraceContext(md transport.Header) apm.TraceContext {
+func parseIncomingMetadataTraceContext(md transport.Header) apm.TraceContext {
 	if value := md.Get(strings.ToLower(apmhttp.W3CTraceparentHeader)); value != "" {
 		apmTraceContext, err := apmhttp.ParseTraceparentHeader(value)
 		if err != nil {
@@ -105,7 +105,7 @@ func newOutgoingContextWithTraceContext(ctx context.Context, apmTraceContext apm
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
-func GetHttpTspFromContext(ctx context.Context) *http.Transport {
+func GetHttpTransportFromContext(ctx context.Context) *http.Transport {
 	if txp, ok := transport.FromServerContext(ctx); ok {
 		if txp.Kind() == transport.KindHTTP {
 			if tsp, ok := txp.(*http.Transport); ok {

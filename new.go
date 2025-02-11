@@ -7,28 +7,23 @@ import (
 	"github.com/yyle88/zaplog"
 )
 
-func INIT(cfg *elasticapm.Config) error {
-	var evo = elasticapm.NewEnvOption()
-
-	zaplog.SUG.Info("init apm cfg=" + neatjsons.S(cfg))
-	zaplog.SUG.Info("init apm evo=" + neatjsons.S(evo))
-
-	if err := INIT2(cfg, evo); err != nil {
+func Initialize(apmConfig *elasticapm.Config) error {
+	if err := InitializeWithOptions(apmConfig, elasticapm.NewEnvOption()); err != nil {
 		return erero.Wro(err)
 	}
-
-	zaplog.LOG.Debug("init apm success")
+	zaplog.LOG.Debug("Initialize apm success")
 	return nil
 }
 
-func INIT2(cfg *elasticapm.Config, evo *elasticapm.EnvOption, setEnvs ...func()) error {
-	zaplog.SUG.Info("init apm cfg=" + neatjsons.S(cfg))
+func InitializeWithOptions(apmConfig *elasticapm.Config, envOption *elasticapm.EnvOption, setEnvs ...func()) error {
+	zaplog.SUG.Info("Initialize apm apm_config=" + neatjsons.S(apmConfig))
+	zaplog.SUG.Info("Initialize apm evo_option=" + neatjsons.S(envOption))
 
-	if err := elasticapm.INIT2(cfg, evo, setEnvs...); err != nil {
+	if err := elasticapm.InitializeWithOptions(apmConfig, envOption, setEnvs...); err != nil {
 		return erero.Wro(err)
 	}
 
-	zaplog.LOG.Debug("init apm success")
+	zaplog.LOG.Debug("Initialize apm success")
 	return nil
 }
 

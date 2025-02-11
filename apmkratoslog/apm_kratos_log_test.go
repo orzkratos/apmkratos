@@ -6,14 +6,14 @@ import (
 	"go.elastic.co/apm/v2"
 )
 
-func TestNewApmLog1Type(t *testing.T) {
+func TestNewLogHelper(t *testing.T) {
 	if false {
-		var _ apm.Logger = &apmLog1Type{}
+		var _ apm.Logger = &logHelper{}
 	}
 }
 
-func TestNewApmLog2Type(t *testing.T) {
+func TestNewApmLogger(t *testing.T) {
 	if false {
-		var _ apm.Logger = &apmLog2Type{}
+		var _ apm.Logger = &apmLogger{}
 	}
 }

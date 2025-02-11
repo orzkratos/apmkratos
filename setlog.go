@@ -6,10 +6,10 @@ import (
 	"go.elastic.co/apm/v2"
 )
 
-func SetLog1(logger log.Logger, msgKey string) {
-	apm.DefaultTracer().SetLogger(apmkratoslog.NewApmLog1Type(logger, msgKey))
+func SetLogHelper(logger log.Logger, msgKey string) {
+	apm.DefaultTracer().SetLogger(apmkratoslog.NewLogHelper(logger, msgKey))
 }
 
-func SetLog2(logger log.Logger, levels log.Level, msgKey string) {
-	apm.DefaultTracer().SetLogger(apmkratoslog.NewApmLog2Type(logger, levels, msgKey))
+func SetApmLogger(logger log.Logger, level log.Level, msgKey string) {
+	apm.DefaultTracer().SetLogger(apmkratoslog.NewApmLogger(logger, level, msgKey))
 }

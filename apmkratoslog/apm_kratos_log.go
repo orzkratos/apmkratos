@@ -10,22 +10,26 @@ import (
 日志实现1
 */
 
-type apmLog1Type log.Helper
-
-func NewApmLog1Type(logger log.Logger, msgKey string) *apmLog1Type {
-	return (*apmLog1Type)(log.NewHelper(logger, log.WithMessageKey(msgKey)))
+type logHelper struct {
+	helper *log.Helper
 }
 
-func (H *apmLog1Type) Debugf(format string, a ...interface{}) {
-	(*log.Helper)(H).Debugf(format, a...)
+func NewLogHelper(logger log.Logger, msgKey string) *logHelper {
+	return &logHelper{
+		helper: log.NewHelper(logger, log.WithMessageKey(msgKey)),
+	}
 }
 
-func (H *apmLog1Type) Errorf(format string, a ...interface{}) {
-	(*log.Helper)(H).Errorf(format, a...)
+func (l *logHelper) Debugf(format string, a ...interface{}) {
+	l.helper.Debugf(format, a...)
 }
 
-func (H *apmLog1Type) Warningf(format string, a ...interface{}) {
-	(*log.Helper)(H).Warnf(format, a...)
+func (l *logHelper) Errorf(format string, a ...interface{}) {
+	l.helper.Errorf(format, a...)
+}
+
+func (l *logHelper) Warningf(format string, a ...interface{}) {
+	l.helper.Warnf(format, a...)
 }
 
 /************************
@@ -33,33 +37,34 @@ func (H *apmLog1Type) Warningf(format string, a ...interface{}) {
 */
 
 // 目前还是不能打印出行号
-type apmLog2Type struct {
+type apmLogger struct {
 	logger log.Logger
-	levels log.Level
+	level  log.Level
 	msgKey string
 }
 
-func NewApmLog2Type(logger log.Logger, levels log.Level, msgKey string) *apmLog2Type {
-	return &apmLog2Type{logger: logger, levels: levels, msgKey: msgKey}
-}
-
-func (H *apmLog2Type) Debugf(format string, a ...interface{}) {
-	const levels = log.LevelDebug
-	if levels >= H.levels {
-		_ = H.logger.Log(levels, H.msgKey, fmt.Sprintf(format, a...))
+func NewApmLogger(logger log.Logger, level log.Level, msgKey string) *apmLogger {
+	return &apmLogger{
+		logger: logger,
+		level:  level,
+		msgKey: msgKey,
 	}
 }
 
-func (H *apmLog2Type) Errorf(format string, a ...interface{}) {
-	const levels = log.LevelError
-	if levels >= H.levels {
-		_ = H.logger.Log(levels, H.msgKey, fmt.Sprintf(format, a...))
+func (l *apmLogger) Debugf(format string, a ...interface{}) {
+	if log.LevelDebug >= l.level {
+		_ = l.logger.Log(log.LevelDebug, l.msgKey, fmt.Sprintf(format, a...))
 	}
 }
 
-func (H *apmLog2Type) Warningf(format string, a ...interface{}) {
-	const levels = log.LevelWarn
-	if levels >= H.levels {
-		_ = H.logger.Log(levels, H.msgKey, fmt.Sprintf(format, a...))
+func (l *apmLogger) Errorf(format string, a ...interface{}) {
+	if log.LevelError >= l.level {
+		_ = l.logger.Log(log.LevelError, l.msgKey, fmt.Sprintf(format, a...))
+	}
+}
+
+func (l *apmLogger) Warningf(format string, a ...interface{}) {
+	if log.LevelWarn >= l.level {
+		_ = l.logger.Log(log.LevelWarn, l.msgKey, fmt.Sprintf(format, a...))
 	}
 }
