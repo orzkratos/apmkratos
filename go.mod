@@ -3,12 +3,12 @@ module github.com/orzkratos/apmkratos
 go 1.22.8
 
 require (
-	github.com/go-kratos/kratos/v2 v2.8.3
-	github.com/go-xlan/elasticapm v0.0.4
+	github.com/go-kratos/kratos/v2 v2.8.4
+	github.com/go-xlan/elasticapm v0.0.5
 	github.com/stretchr/testify v1.10.0
-	github.com/yyle88/erero v1.0.17
-	github.com/yyle88/neatjson v0.0.11
-	github.com/yyle88/zaplog v0.0.19
+	github.com/yyle88/erero v1.0.19
+	github.com/yyle88/neatjson v0.0.12
+	github.com/yyle88/zaplog v0.0.21
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.3
 	go.elastic.co/apm/v2 v2.6.3
 	go.uber.org/zap v1.27.0
@@ -27,12 +27,12 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/yyle88/done v1.0.21 // indirect
-	github.com/yyle88/must v0.0.13 // indirect
+	github.com/yyle88/done v1.0.24 // indirect
+	github.com/yyle88/must v0.0.20 // indirect
 	github.com/yyle88/mutexmap v1.0.10 // indirect
-	github.com/yyle88/sure v0.0.36 // indirect
-	github.com/yyle88/syntaxgo v0.0.44 // indirect
-	github.com/yyle88/tern v0.0.5 // indirect
+	github.com/yyle88/sure v0.0.38 // indirect
+	github.com/yyle88/syntaxgo v0.0.48 // indirect
+	github.com/yyle88/tern v0.0.6 // indirect
 	go.elastic.co/fastjson v1.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect

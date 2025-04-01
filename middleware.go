@@ -16,8 +16,8 @@ import (
 )
 
 func Middleware() middleware.Middleware {
-	var m1 middleware.Middleware = NewApmTraceMiddleware() //追踪流程
-	var m2 middleware.Middleware = NewRecoveryMiddleware() //追踪崩溃
+	var m1 = NewApmTraceMiddleware() //追踪流程
+	var m2 = NewRecoveryMiddleware() //追踪崩溃
 	return func(handleFunc middleware.Handler) middleware.Handler {
 		return m1(m2(handleFunc))
 	}
