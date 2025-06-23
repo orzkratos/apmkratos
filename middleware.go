@@ -41,8 +41,8 @@ func NewApmTraceMiddleware() middleware.Middleware {
 				defer apmTx.End()
 				defer setGRPCContext(&apmTx.Context)
 			case transport.KindHTTP:
-				htx := GetHttpTransportFromContext(ctx)
-				req := htx.Request()
+				httpTransport := GetHttpTransportFromContext(ctx)
+				req := httpTransport.Request()
 				requestName := apmhttp.ServerRequestName(req)
 				apmTx, body, req := apmhttp.StartTransactionWithBody(apm.DefaultTracer(), requestName, req)
 				ctx = apm.ContextWithTransaction(ctx, apmTx)
@@ -106,10 +106,10 @@ func newOutgoingContextWithTraceContext(ctx context.Context, apmTraceContext apm
 }
 
 func GetHttpTransportFromContext(ctx context.Context) *http.Transport {
-	if txp, ok := transport.FromServerContext(ctx); ok {
-		if txp.Kind() == transport.KindHTTP {
-			if tsp, ok := txp.(*http.Transport); ok {
-				return tsp
+	if tsp, ok := transport.FromServerContext(ctx); ok {
+		if tsp.Kind() == transport.KindHTTP {
+			if res, ok := tsp.(*http.Transport); ok {
+				return res
 			}
 		}
 	}
