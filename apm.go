@@ -1,3 +1,12 @@
+// Package apmkratos provides advanced Elastic APM middleware integration with Kratos microservice framework
+// Implements enterprise-grade distributed tracing capabilities across gRPC and HTTP transport protocols
+// Combines intelligent request tracking with panic detection and reporting
+// Optimized through W3C TraceContext propagation standards enabling seamless cross-service tracing
+//
+// apmkratos 包为 Kratos 微服务框架提供高级 Elastic APM 中间件集成
+// 实现跨 gRPC 和 HTTP 传输协议的企业级分布式追踪功能
+// 结合智能请求追踪与自动 panic 检测和上报机制
+// 通过 W3C TraceContext 传播标准优化，实现无缝跨服务追踪
 package apmkratos
 
 import (
@@ -7,21 +16,30 @@ import (
 	"go.uber.org/zap"
 )
 
-// GetApmAgentVersion 获得版本号
-// 假如你用的我的包，我的包 go.mod 里面引用的 apm 是 v2.0.0 的，这里就会返回 v2.0.0 版本号字符串
-// 假如你项目里直接用到 apm 包，则你需要检查你的包和我的包版本是否相同
-// 假如不同，逻辑不通
+// GetApmAgentVersion retrieves the Elastic APM agent version ID embedded within this package
+// Returns version string enabling APM agent version checks at application scope
+// Important when coordinating packages that depend on specific APM agent releases
+//
+// 检索嵌入在此包中的 Elastic APM agent 版本标识符
+// 返回版本字符串，使应用程序级别能够验证 APM agent 兼容性
+// 在协调依赖特定 APM agent 发布的多个包时至关重要
 func GetApmAgentVersion() string {
 	return apm.AgentVersion
 }
 
-// CheckApmAgentVersion 检查apm包版本是否相同，这是因为apm作为单独的模块，假如使用的版本不同，逻辑就无法正常执行
-// 因此建议是所有使用到 apm 的三方包都能够实现这个函数
-// 以确保不同模块使用的apm包版本相同
+// CheckApmAgentVersion validates version alignment between given version and package-embedded APM agent
+// Performs version checks across the whole package chain including nested modules
+// Returns false when version mismatch is detected to prevent runtime conflicts
+//
+// 验证提供的版本与包嵌入的 APM agent 之间的版本对齐
+// 实现跨完整依赖链（包括嵌套模块）的全面兼容性验证
+// 检测到版本不匹配时返回 false，防止潜在的运行时不兼容性
 func CheckApmAgentVersion(version string) bool {
 	if agentVersion := apm.AgentVersion; version != agentVersion {
 		zaplog.LOGGER.LOG.Warn("check apm agent versions not match", zap.String("arg_version", version), zap.String("pkg_version", agentVersion))
 		return false
 	}
-	return elasticapm.CheckApmAgentVersion(version) //把依赖的模块也检查检查
+	// Check version alignment across the package chain
+	// 递归验证依赖模块链中的版本一致性
+	return elasticapm.CheckApmAgentVersion(version)
 }

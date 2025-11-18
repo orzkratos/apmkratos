@@ -7,40 +7,42 @@
 
 # apmkratos
 
-<!-- TEMPLATE (EN) BEGIN: LANGUAGE NAVIGATION -->
-## CHINESE README
+<!-- TEMPLATE (ZH) BEGIN: LANGUAGE NAVIGATION -->
+## ENGLISH README
 
-[中文说明](README.zh.md)
-<!-- TEMPLATE (EN) END: LANGUAGE NAVIGATION -->
+[English](README.md)
+<!-- TEMPLATE (ZH) END: LANGUAGE NAVIGATION -->
 
-Elastic APM middleware to integrate with Kratos framework, providing distributed tracing and performance monitoring.
+Kratos 框架的 Elastic APM 中间件，提供分布式追踪和性能监控能力。
 
-## Features
+## 特性
 
-- 🚀 Simple Integration - Get started with just a few lines of code
-- 📊 Distributed Tracing - Auto trace gRPC and HTTP requests
-- 🔍 Error Tracking - Auto capture business errors and panics
-- 🌐 W3C Standard - Support W3C TraceContext propagation
-- ⚡ Zero Intrusion - Built on Kratos middleware
+- 🚀 简单集成 - 只需几行代码即可接入
+- 📊 链路追踪 - 自动追踪 gRPC 和 HTTP 请求
+- 🔍 错误追踪 - 自动捕获业务错误和 Panic
+- 🌐 W3C 标准 - 支持 W3C TraceContext 传播
+- ⚡ 零侵入 - 基于 Kratos 中间件实现
 
-## Version
+## 依赖版本
 
-This project uses Elastic APM v2:
+本项目使用 Elastic APM v2:
 ```
 go.elastic.co/apm/v2
 ```
 
-## Installation
+不再支持 v1 版本。
+
+## 安装
 
 ```bash
 go get github.com/orzkratos/apmkratos
 ```
 
-## Quick Start
+## 快速开始
 
-### 1. Initialize APM
+### 1. 初始化 APM
 
-Initialize APM config when application starts:
+在应用启动时初始化 APM 配置：
 
 ```go
 package main
@@ -51,7 +53,7 @@ import (
 )
 
 func main() {
-    // Config APM
+    // 配置 APM
     apmConfig := &elasticapm.Config{
         ServiceName:    "my-service",
         ServiceVersion: "1.0.0",
@@ -59,17 +61,17 @@ func main() {
         ServerURL:      "http://localhost:8200",
     }
 
-    // Initialize APM
+    // 初始化 APM
     if err := apmkratos.Initialize(apmConfig); err != nil {
         panic(err)
     }
     defer apmkratos.Close()
 
-    // Start app...
+    // 启动应用...
 }
 ```
 
-### 2. Integrate with Kratos Server
+### 2. 集成到 Kratos Server
 
 #### HTTP Server
 
@@ -83,15 +85,15 @@ import (
 )
 
 func main() {
-    // Create HTTP Server with APM middleware
+    // 创建 HTTP Server，注册 APM 中间件
     httpSrv := http.NewServer(
         http.Address(":8000"),
         http.Middleware(
-            apmkratos.Middleware(), // Add APM middleware
+            apmkratos.Middleware(), // 添加 APM 中间件
         ),
     )
 
-    // Register services...
+    // 注册服务...
 
     app := kratos.New(
         kratos.Name("my-service"),
@@ -116,15 +118,15 @@ import (
 )
 
 func main() {
-    // Create gRPC Server with APM middleware
+    // 创建 gRPC Server，注册 APM 中间件
     grpcSrv := grpc.NewServer(
         grpc.Address(":9000"),
         grpc.Middleware(
-            apmkratos.Middleware(), // Add APM middleware
+            apmkratos.Middleware(), // 添加 APM 中间件
         ),
     )
 
-    // Register services...
+    // 注册服务...
 
     app := kratos.New(
         kratos.Name("my-service"),
@@ -137,7 +139,7 @@ func main() {
 }
 ```
 
-#### Both HTTP and gRPC
+#### 同时支持 HTTP 和 gRPC
 
 ```go
 package main
@@ -150,7 +152,7 @@ import (
 )
 
 func main() {
-    // APM middleware supports both HTTP and gRPC
+    // APM 中间件同时支持 HTTP 和 gRPC
     middleware := apmkratos.Middleware()
 
     httpSrv := http.NewServer(
@@ -163,7 +165,7 @@ func main() {
         grpc.Middleware(middleware),
     )
 
-    // Register services...
+    // 注册服务...
 
     app := kratos.New(
         kratos.Name("my-service"),
@@ -176,9 +178,9 @@ func main() {
 }
 ```
 
-## Advanced Usage
+## 高级用法
 
-### Custom Environment Config
+### 自定义环境变量配置
 
 ```go
 package main
@@ -194,10 +196,10 @@ func main() {
         ServerURL:   "http://apm-server:8200",
     }
 
-    // Custom environment option
+    // 自定义环境变量选项
     envOption := elasticapm.NewEnvOption()
 
-    // Initialize with custom option
+    // 使用自定义选项初始化
     if err := apmkratos.InitializeWithOptions(apmConfig, envOption); err != nil {
         panic(err)
     }
@@ -205,9 +207,9 @@ func main() {
 }
 ```
 
-### Version Alignment Check
+### 版本对齐检查
 
-Ensure modules using APM maintain version alignment:
+确保使用 APM 的模块版本保持对齐：
 
 ```go
 package main
@@ -218,18 +220,18 @@ import (
 )
 
 func main() {
-    // Check APM version
+    // 检查 APM 版本
     version := apmkratos.GetApmAgentVersion()
     println("APM Agent Version:", version)
 
-    // Check version alignment
+    // 检查版本对齐
     if !apmkratos.CheckApmAgentVersion(apm.AgentVersion) {
         panic("APM version mismatch")
     }
 }
 ```
 
-### Complete Example
+### 完整示例
 
 ```go
 package main
@@ -247,7 +249,7 @@ import (
 )
 
 func main() {
-    // 1. Initialize APM
+    // 1. 初始化 APM
     apmConfig := &elasticapm.Config{
         ServiceName:    "demo-service",
         ServiceVersion: "1.0.0",
@@ -260,16 +262,16 @@ func main() {
     }
     defer apmkratos.Close()
 
-    // 2. Create HTTP Server
+    // 2. 创建 HTTP Server
     httpSrv := http.NewServer(
         http.Address(":8000"),
         http.Middleware(
-            recovery.Recovery(), // Recommend to work with recovery middleware
+            recovery.Recovery(), // 建议配合 recovery 中间件
             apmkratos.Middleware(),
         ),
     )
 
-    // 3. Create gRPC Server
+    // 3. 创建 gRPC Server
     grpcSrv := grpc.NewServer(
         grpc.Address(":9000"),
         grpc.Middleware(
@@ -278,11 +280,11 @@ func main() {
         ),
     )
 
-    // 4. Register service handlers
+    // 4. 注册服务处理器
     // RegisterGreeterHTTPServer(httpSrv, &GreeterService{})
     // RegisterGreeterServer(grpcSrv, &GreeterService{})
 
-    // 5. Start app
+    // 5. 启动应用
     app := kratos.New(
         kratos.Name("demo-service"),
         kratos.Version("1.0.0"),
@@ -294,84 +296,84 @@ func main() {
     }
 }
 
-// GreeterService example service
+// GreeterService 示例服务
 type GreeterService struct{}
 
 func (s *GreeterService) SayHello(ctx context.Context, req *HelloRequest) (*HelloReply, error) {
-    // Business logic
-    // APM auto traces this request
+    // 业务逻辑
+    // APM 自动追踪此请求
     return &HelloReply{Message: "Hello " + req.Name}, nil
 }
 ```
 
-## Middleware Features
+## 中间件功能
 
-### Auto Tracing
+### 自动追踪
 
-APM middleware auto traces:
+APM 中间件自动追踪：
 
-- ✅ Complete request trace
-- ✅ Request duration and performance metrics
-- ✅ Context propagation (W3C TraceContext)
-- ✅ Framework info (Kratos v2)
+- ✅ 请求的完整链路
+- ✅ 请求耗时和性能指标
+- ✅ 上下文传播 (W3C TraceContext)
+- ✅ 框架信息 (Kratos v2)
 
-### Error Tracking
+### 错误追踪
 
-Auto capture and report:
+自动捕获和上报：
 
-- ✅ Business errors (from middleware.Handler)
-- ✅ Panic exceptions (works with recovery middleware)
-- ✅ Error stack and context info
+- ✅ 业务错误 (通过 middleware.Handler 返回)
+- ✅ Panic 异常 (配合 recovery 中间件)
+- ✅ 错误堆栈和上下文信息
 
-### Context Propagation
+### 上下文传播
 
-Support cross-service distributed tracing:
+支持跨服务的链路追踪：
 
 ```go
-// Service A calls Service B, trace info auto propagates
+// 服务 A 调用服务 B，追踪信息自动传播
 func (s *ServiceA) CallServiceB(ctx context.Context) error {
-    // ctx contains trace info
-    // APM auto adds TraceContext to request headers
+    // ctx 中包含追踪信息
+    // APM 自动添加 TraceContext 到请求头
     resp, err := s.serviceBClient.DoSomething(ctx, &Request{})
     return err
 }
 ```
 
-### Access HTTP Transport
+### 访问 HTTP Transport
 
-Get HTTP transport from context when needed:
+需要时从上下文获取 HTTP transport：
 
 ```go
 import "github.com/orzkratos/apmkratos"
 
 func MyHandler(ctx context.Context, req *Request) (*Response, error) {
-    // Get HTTP transport if available
+    // 获取 HTTP transport（如果可用）
     transport := apmkratos.GetHttpTransportFromContext(ctx)
     if transport != nil {
-        // Access request info
+        // 访问请求信息
         httpReq := transport.Request()
-        // Do something with HTTP request
+        // 处理 HTTP 请求
     }
     return &Response{}, nil
 }
 ```
 
-## Configuration
+## 配置说明
 
-### APM Config Parameters
+### APM Config 参数
 
 ```go
 type Config struct {
-    ServiceName    string // Service name (required)
-    ServiceVersion string // Service version
-    Environment    string // Environment (dev/staging/production)
-    ServerURL      string // APM Server address
+    ServiceName    string // 服务名称 (必填)
+    ServiceVersion string // 服务版本
+    Environment    string // 环境标识 (dev/staging/production)
+    ServerURL      string // APM Server 地址
 }
 ```
 
-### Environment Variables
+### 环境变量
 
-You can also config APM via environment variables:
+也可以通过环境变量配置 APM：
 
 ```bash
 export ELASTIC_APM_SERVICE_NAME="my-service"
@@ -380,41 +382,41 @@ export ELASTIC_APM_ENVIRONMENT="production"
 export ELASTIC_APM_SERVICE_VERSION="1.0.0"
 ```
 
-## Best Practices
+## 最佳实践
 
-### 1. Middleware Sequence
+### 1. 中间件顺序
 
-Recommend placing APM middleware following business middlewares and preceding panic recovery middleware:
+建议将 APM 中间件放置在业务中间件之后、recovery 中间件之前：
 
 ```go
 http.Middleware(
-    logging.Server(),      // Logging middleware
-    recovery.Recovery(),   // Recovery middleware
-    apmkratos.Middleware(), // APM middleware
-    validate.Validator(),  // Validation middleware
+    logging.Server(),      // 日志中间件
+    recovery.Recovery(),   // 恢复中间件
+    apmkratos.Middleware(), // APM 中间件
+    validate.Validator(),  // 验证中间件
 )
 ```
 
-### 2. Work with Recovery Middleware
+### 2. 与 Recovery 中间件配合
 
-APM middleware has integrated Recovery feature, you can use it in two ways:
+APM 中间件内部已经集成了 Recovery 功能，如果单独使用可以：
 
 ```go
-// Way 1: Use APM's built-in Recovery
+// 方式 1：使用 APM 自带的 Recovery
 http.Middleware(
-    apmkratos.Middleware(), // Already includes Recovery
+    apmkratos.Middleware(), // 已包含 Recovery
 )
 
-// Way 2: Use Kratos Recovery + APM
+// 方式 2：使用 Kratos 的 Recovery + APM
 http.Middleware(
     recovery.Recovery(),
     apmkratos.Middleware(),
 )
 ```
 
-### 3. Version Check
+### 3. 版本检查
 
-Check APM version alignment when app starts:
+在应用启动时检查 APM 版本对齐：
 
 ```go
 func init() {
@@ -427,81 +429,81 @@ func init() {
 }
 ```
 
-## Dependencies
+## 依赖项
 
-- `github.com/go-kratos/kratos/v2` - Kratos microservice framework
+- `github.com/go-kratos/kratos/v2` - Kratos 微服务框架
 - `go.elastic.co/apm/v2` - Elastic APM Go Agent
-- `github.com/go-xlan/elasticapm` - APM config helper
-- `github.com/yyle88/zaplog` - Logging tool
+- `github.com/go-xlan/elasticapm` - APM 配置辅助包
+- `github.com/yyle88/zaplog` - 日志工具
 
-## Related Projects
+## 相关项目
 
-- [Kratos](https://github.com/go-kratos/kratos) - Go microservice framework
-- [Elastic APM](https://www.elastic.co/apm) - Application Performance Monitoring
-- [elasticapm](https://github.com/go-xlan/elasticapm) - APM config tool
+- [Kratos](https://github.com/go-kratos/kratos) - Go 微服务框架
+- [Elastic APM](https://www.elastic.co/apm) - 应用性能监控
+- [elasticapm](https://github.com/go-xlan/elasticapm) - APM 配置工具
 
-<!-- TEMPLATE (EN) BEGIN: STANDARD PROJECT FOOTER -->
+<!-- TEMPLATE (ZH) BEGIN: STANDARD PROJECT FOOTER -->
 <!-- VERSION 2025-09-26 07:39:27.188023 +0000 UTC -->
 
-## 📄 License
+## 📄 许可证
 
-MIT License - see [LICENSE](LICENSE) file
-
----
-
-## 💬 Contact & Feedback
-
-**Issues & Feedback:**
-
-- 🐛 **Bug reports?** Open an issue and describe the problem with reproduction steps
-- ✨ **Feature ideas?** Open an issue to discuss the implementation approach
-- 📖 **Documentation confusing?** Report it so we can improve
-- 🚀 **Need new features?** Share the use cases to help us understand requirements
-- ⚡ **Performance issue?** Help us optimize through reporting slow operations
-- 🔧 **Configuration problem?** Ask questions about complex setups
-- 📢 **Follow project progress?** Watch the repo to get new releases and features
-- 🌟 **Success stories?** Share how this package improved the workflow
-- 💬 **Feedback?** We welcome suggestions and comments
+MIT License - 查看 [LICENSE](LICENSE) 文件
 
 ---
 
-## 🔧 Development
+## 💬 联系反馈
 
-New code contributions, follow this process:
+**问题和反馈：**
 
-1. **Fork**: Fork the repo on GitHub (using the webpage UI).
-2. **Clone**: Clone the forked project (`git clone https://github.com/yourname/apmkratos.git`).
-3. **Navigate**: Navigate to the cloned project (`cd apmkratos`)
-4. **Branch**: Create a feature branch (`git checkout -b feature/xxx`).
-5. **Code**: Implement the changes with comprehensive tests
-6. **Testing**: (Golang project) Ensure tests pass (`go test ./...`) and follow Go code style conventions
-7. **Documentation**: Update documentation to support client-facing changes and use significant commit messages
-8. **Stage**: Stage changes (`git add .`)
-9. **Commit**: Commit changes (`git commit -m "Add feature xxx"`) ensuring backward compatible code
-10. **Push**: Push to the branch (`git push origin feature/xxx`).
-11. **PR**: Open a merge request on GitHub (on the GitHub webpage) with detailed description.
-
-Please ensure tests pass and include relevant documentation updates.
+- 🐛 **Bug 报告？** 打开 issue 并描述问题和复现步骤
+- ✨ **功能想法？** 打开 issue 讨论实现方案
+- 📖 **文档疑惑？** 报告问题，帮助我们改进文档
+- 🚀 **需要功能？** 分享使用场景，帮助理解需求
+- ⚡ **性能瓶颈？** 报告慢操作，帮助我们优化性能
+- 🔧 **配置困扰？** 询问复杂设置的相关问题
+- 📢 **关注进展？** 关注仓库以获取新版本和功能
+- 🌟 **成功案例？** 分享这个包如何改善工作流程
+- 💬 **反馈意见？** 欢迎提出建议和意见
 
 ---
 
-## 🌟 Support
+## 🔧 代码贡献
 
-Welcome to contribute to this project via submitting merge requests and reporting issues.
+新代码贡献，请遵循此流程：
 
-**Project Support:**
+1. **Fork**：在 GitHub 上 Fork 仓库（使用网页界面）
+2. **克隆**：克隆 Fork 的项目（`git clone https://github.com/yourname/apmkratos.git`）
+3. **导航**：进入克隆的项目（`cd apmkratos`）
+4. **分支**：创建功能分支（`git checkout -b feature/xxx`）
+5. **编码**：实现您的更改并编写全面的测试
+6. **测试**：（Golang 项目）确保测试通过（`go test ./...`）并遵循 Go 代码风格约定
+7. **文档**：为面向用户的更改更新文档，并使用有意义的提交消息
+8. **暂存**：暂存更改（`git add .`）
+9. **提交**：提交更改（`git commit -m "Add feature xxx"`）确保向后兼容的代码
+10. **推送**：推送到分支（`git push origin feature/xxx`）
+11. **PR**：在 GitHub 上打开 Merge Request（在 GitHub 网页上）并提供详细描述
 
-- ⭐ **Give GitHub stars** if this project helps you
-- 🤝 **Share with teammates** and (golang) programming friends
-- 📝 **Write tech blogs** about development tools and workflows - we provide content writing support
-- 🌟 **Join the ecosystem** - committed to supporting open source and the (golang) development scene
-
-**Have Fun Coding with this package!** 🎉🎉🎉
-
-<!-- TEMPLATE (EN) END: STANDARD PROJECT FOOTER -->
+请确保测试通过并包含相关的文档更新。
 
 ---
 
-## GitHub Stars
+## 🌟 项目支持
+
+非常欢迎通过提交 Merge Request 和报告问题来为此项目做出贡献。
+
+**项目支持：**
+
+- ⭐ **给予星标**如果项目对您有帮助
+- 🤝 **分享项目**给团队成员和（golang）编程朋友
+- 📝 **撰写博客**关于开发工具和工作流程 - 我们提供写作支持
+- 🌟 **加入生态** - 致力于支持开源和（golang）开发场景
+
+**祝你用这个包编程愉快！** 🎉🎉🎉
+
+<!-- TEMPLATE (ZH) END: STANDARD PROJECT FOOTER -->
+
+---
+
+## GitHub 标星点赞
 
 [![Stargazers](https://starchart.cc/orzkratos/apmkratos.svg?variant=adaptive)](https://starchart.cc/orzkratos/apmkratos)
